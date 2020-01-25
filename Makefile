@@ -56,6 +56,10 @@ test:	## make file=connect folder=./tests/python test args="localhost 80 / 200"
 tests:
 	./run_tests.sh
 
+.PHONY: crawl-local
+crawl-local:
+	make folder=./tests/python file=crawl test args="http://localhost:${WORDPRESS_PORT}"
+
 .PHONY: help
 help:
 	@awk 'BEGIN {FS = ":.*?## "} /^[a-zA-Z0-9_-]+:.*?## / {printf "\033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
