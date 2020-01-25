@@ -9,7 +9,7 @@ services:
     restart: unless-stopped
 #    tested on this image
 #    image: quay.io/bukow/nginx-proxy:01-24-2020
-    image: jwilder/nginx-proxy-alpine
+    image: jwilder/nginx-proxy:alpine
     ports:
       - 80:80
     volumes:
