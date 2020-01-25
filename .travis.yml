@@ -15,6 +15,7 @@ before_script:
 - source .env
 - echo "127.0.0.1 ${DOMAIN_NAME}" | sudo tee -a /etc/hosts
 script:
+- chmod +x ./run_tests.sh
 - make tests
 after_failure:
 - docker ps
