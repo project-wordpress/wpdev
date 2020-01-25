@@ -37,10 +37,10 @@ clear:
 
 .PHONY: db-export
 db-export:
-	@${WP-CLI} wp db export ${MYSQLAUTH} --porcelain
+	@${WP-CLI} wp db export $$MYSQLAUTH --porcelain
 
 .PHONY: copy-db
-wtf:
+copy-db:
 	BACKUP_FILE=$(shell make db-export | tail -1);\
 	cp ./var/backups/$$BACKUP_FILE ./mysql/docker-entrypoint-initdb.d
 
