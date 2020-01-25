@@ -1,7 +1,6 @@
 #### Wordpress Development Stack
 [![Build Status](https://travis-ci.org/project-wordpress/wpdev.svg?branch=master)](https://travis-ci.org/project-wordpress/wpdev)
 
-
 Local stack for developing [`wordpress`](https://wordpress.org/)
 
 ```bash
@@ -15,17 +14,12 @@ da0e07d3dcb3        nginx_1        0.00%               2.82MiB / 7.79GiB    0.04
 
 16ce9c05cc74        mysql_1        0.25%               83.1MiB / 7.79GiB    1.04%               146kB / 611kB       0B / 58.2MB         41
 ```
-### Dependencies:
-* [docker](https://www.docker.com/)
-* [docker-compose](https://docs.docker.com/compose/)
-* [wordpress](https://hub.docker.com/_/wordpress)
-* [wp-cli](https://hub.docker.com/_/wordpress)
-* [mysql](https://hub.docker.com/_/mysql/)
-* [nginx](https://hub.docker.com/_/nginx)
-* [nginx-proxy](https://github.com/jwilder/nginx-proxy)
-* [phpmyadmin](https://hub.docker.com/r/phpmyadmin/phpmyadmin/)
-* [make](https://www.gnu.org/software/make/)
-* [travis](https://travis-ci.org/) for builds
+## Info
+* please get involved if you can
+* tests are parsing your site and checking if everything responds with status code `200`, to change that behaviour see [this file](./tests/python/crawl.py)
+* static files are handled by `nginx`
+* wp-cli will handle changing `SITE_URL` based on your `.env` settings
+* this stack can be easy deployed live using `make deploy`
 
 ### Requirements:
 * [docker](https://www.docker.com/)
@@ -45,13 +39,92 @@ http://localhost:$WORDPRESS_PORT
 http://localhost:$PHPMYADMIN_PORT
 ```
 
+## Tests
+* while running `make tests` or directly calling `run_tests.sh` live deployment will be tested too, it means that your host should resolve `$DOMAIN_NAME` from `.env` file
+* to run a simle crawling test checking for status code 200 on your local development run
+    ```bash
+    make crawl-local
+    ```
+  ```bash
+    PARSED
+    {
+        "http://localhost:9344/?feed=rss2": 200,
+        "http://localhost:9344/?feed=comments-rss2": 200,
+        "http://localhost:9344/wp-includes/css/dist/block-library/style.min.css?ver=5.3.2": 200,
+        "http://localhost:9344/wp-content/themes/twentytwenty/style.css?ver=1.1": 200,
+        "http://localhost:9344/wp-content/themes/twentytwenty/print.css?ver=1.1": 200,
+        "http://localhost:9344/wp-content/themes/twentytwenty/assets/js/index.js?ver=1.1": 200,
+        "http://localhost:9344/index.php?rest_route=/": 200,
+        "http://localhost:9344/xmlrpc.php?rsd": 200,
+        "http://localhost:9344/wp-includes/wlwmanifest.xml": 200,
+        "http://localhost:9344/": 200,
+        "http://localhost:9344/?page_id=2": 200,
+        "http://localhost:9344/?cat=1": 200,
+        "http://localhost:9344/?p=1": 200,
+        "http://localhost:9344/?author=1": 200,
+        "http://localhost:9344/?p=1#comments": 200,
+        "http://localhost:9344/?p=1#comment-1": 200,
+        "http://localhost:9344/?m=202001": 200,
+        "http://localhost:9344/wp-login.php": 200,
+        "http://localhost:9344/wp-includes/js/wp-embed.min.js?ver=5.3.2": 200,
+        "http://localhost:9344/xmlrpc.php": 405,
+        "http://localhost:9344/?feed=rss2&#038;page_id=2": 200,
+        "http://localhost:9344/?p=2": 200,
+        "http://localhost:9344/index.php?rest_route=%2Foembed%2F1.0%2Fembed&#038;url=http%3A%2F%2Flocalhost%3A9344%2F%3Fpage_id%3D2": 400,
+        "http://localhost:9344/index.php?rest_route=%2Foembed%2F1.0%2Fembed&#038;url=http%3A%2F%2Flocalhost%3A9344%2F%3Fpage_id%3D2&#038;format=xml": 400,
+        "http://localhost:9344/wp-admin/": 200,
+        "http://localhost:9344/?feed=rss2&#038;cat=1": 200,
+        "http://localhost:9344/?feed=rss2&#038;p=1": 200,
+        "http://localhost:9344/index.php?rest_route=%2Foembed%2F1.0%2Fembed&#038;url=http%3A%2F%2Flocalhost%3A9344%2F%3Fp%3D1": 400,
+        "http://localhost:9344/index.php?rest_route=%2Foembed%2F1.0%2Fembed&#038;url=http%3A%2F%2Flocalhost%3A9344%2F%3Fp%3D1&#038;format=xml": 400,
+        "http://localhost:9344/?p=1&#038;replytocom=1#respond": 200,
+        "http://localhost:9344/wp-comments-post.php": 405,
+        "http://localhost:9344/wp-includes/js/comment-reply.min.js?ver=5.3.2": 200,
+        "http://localhost:9344/?feed=rss2&#038;author=1": 200,
+        "http://localhost:9344/wp-includes/css/dashicons.min.css?ver=5.3.2": 200,
+        "http://localhost:9344/wp-includes/css/buttons.min.css?ver=5.3.2": 200,
+        "http://localhost:9344/wp-admin/css/forms.min.css?ver=5.3.2": 200,
+        "http://localhost:9344/wp-admin/css/l10n.min.css?ver=5.3.2": 200,
+        "http://localhost:9344/wp-admin/css/login.min.css?ver=5.3.2": 200,
+        "http://localhost:9344/wp-login.php?action=lostpassword": 200,
+        "http://localhost:9344/wp-includes/js/jquery/jquery.js?ver=1.12.4-wp": 200,
+        "http://localhost:9344/wp-includes/js/jquery/jquery-migrate.min.js?ver=1.4.1": 200,
+        "http://localhost:9344/wp-includes/js/zxcvbn-async.min.js?ver=1.0": 200,
+        "http://localhost:9344/wp-admin/js/password-strength-meter.min.js?ver=5.3.2": 200,
+        "http://localhost:9344/wp-includes/js/underscore.min.js?ver=1.8.3": 200,
+        "http://localhost:9344/wp-includes/js/wp-util.min.js?ver=5.3.2": 200,
+        "http://localhost:9344/wp-admin/js/user-profile.min.js?ver=5.3.2": 200
+    }
+    ERRORS_ALLOWED
+    {
+        "http://localhost:9344/xmlrpc.php": 405,
+        "http://localhost:9344/index.php?rest_route=%2Foembed%2F1.0%2Fembed&#038;url=http%3A%2F%2Flocalhost%3A9344%2F%3Fpage_id%3D2": 400,
+        "http://localhost:9344/index.php?rest_route=%2Foembed%2F1.0%2Fembed&#038;url=http%3A%2F%2Flocalhost%3A9344%2F%3Fpage_id%3D2&#038;format=xml": 400,
+        "http://localhost:9344/index.php?rest_route=%2Foembed%2F1.0%2Fembed&#038;url=http%3A%2F%2Flocalhost%3A9344%2F%3Fp%3D1": 400,
+        "http://localhost:9344/index.php?rest_route=%2Foembed%2F1.0%2Fembed&#038;url=http%3A%2F%2Flocalhost%3A9344%2F%3Fp%3D1&#038;format=xml": 400,
+        "http://localhost:9344/wp-comments-post.php": 405
+    }
+    ERRORS_BODY
+    {}
+    ERRORS
+    {}
 
-## Info
-* tests are parsing your site and checking if everything responds with status code `200`, to change that behaviour see [this file](./tests/python/crawl.py)
-* static files are handled by `nginx`
-* wp-cli will handle changing `SITE_URL`
-* this stack can be easy deployed live using `make deploy`
-# todo
-* `localhost:9333/asdASDa/435/345/345/345` >> `homepage` why?
-* modify wp-cli to allow custom setup (activating plugins etc.)
-* allow crawl.py allowed rules to be specified in a file
+  ```
+### Dependencies:
+* [docker](https://www.docker.com/)
+* [docker-compose](https://docs.docker.com/compose/)
+* [wordpress](https://hub.docker.com/_/wordpress)
+* [wp-cli](https://hub.docker.com/_/wordpress)
+* [mysql](https://hub.docker.com/_/mysql/)
+* [nginx](https://hub.docker.com/_/nginx)
+* [nginx-proxy](https://github.com/jwilder/nginx-proxy)
+* [phpmyadmin](https://hub.docker.com/r/phpmyadmin/phpmyadmin/)
+* [make](https://www.gnu.org/software/make/)
+* [travis](https://travis-ci.org/) for builds
+
+# todo & needs fixing
+* urls like `localhost:9333/asdASDa/435/345/345/345` redirect to `homepage` why?
+* modify `wp-cli` to allow custom setup (activating plugins etc.)
+* allow `crawl.py` allowed rules to be specified in a file
+* create solid `nginx` configuration
+
