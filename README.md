@@ -149,3 +149,4 @@ make copy-db
 * create solid `nginx` configuration
 * test file permissions and sensitive files
 * mysql 8.0.18 gives `mbind: Operation not permitted`
+* test db import export
