@@ -1,0 +1,23 @@
+name: Dev
+
+on: [push, pull_request]
+
+jobs:
+
+  develop:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: add $DOMAIN_NAME to hosts
+      run: |
+        source .env
+        echo "127.0.0.1 ${DOMAIN_NAME}" | sudo tee -a /etc/hosts
+
+    - name: test
+      run: make tests
+
+    - name: stats
+      run: |
+        docker ps
+        docker stats --no-stream

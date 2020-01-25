@@ -1,0 +1,27 @@
+language: ruby
+services:
+- docker
+env:
+- DOCKER_COMPOSE_VERSION=1.24.1
+before_install:
+- sudo rm /usr/local/bin/docker-compose
+- curl -L https://github.com/docker/compose/releases/download/${DOCKER_COMPOSE_VERSION}/docker-compose-`uname
+  -s`-`uname -m` > docker-compose
+- chmod +x docker-compose
+- sudo mv docker-compose /usr/local/bin
+- docker --version
+- docker-compose --version
+before_script:
+- source .env
+- echo "127.0.0.1 ${DOMAIN_NAME}" | sudo tee -a /etc/hosts
+script:
+- make tests
+after_failure:
+- docker ps
+- docker stats --no-stream
+after_success: |
+  docker ps
+  docker stats --no-stream
+notifications:
+  slack:
+    secure: ecNDNMO5Qvc3OigENdAVbLmj3Y0q/4VAHgDDy52cZRBUb4NYnin/OubFKEIJ+oYkYEHIPh69z/2tDeZ2KsyZXykC1/YxkFGoJz/Jk+iAuhnrDurSivCoq21Oyre0+9idKKiwejv/Goxjqwb5qtawkACkuNmiKv8upy/GP/Qmyw2AN9lS2jnltXGz90ZaOLCyFS27x/WFluLmoqZ77E1Gk15yTiyAPrwQ8NgN5NTmDkO1U3njJV69eqAxnSWfIRXNdWMuknZI4T+Ae2dC3cdCGcmY4XkSDGzXZjPxt0EGjhEBT9RhiYpJW8oMrhtqGi9Q4Bnm5To224jaaaain3TpsbEXjcXPce5jvMvDQCVxUGJe9hMuuDGdMSH1jFmPut6WsXCQIDkS1yP6G7DZMbOQyfvIuc2/Up1m+8KjPDojPWzV6Zzj3SVRFmsM82z/o6A9hhoSg89LzTmMr8U9J7AMaqGrTIVOwhTKdmaXSElwhzkLoCwl0TEfcWQ2WuW3f4R/+GI8I8kyAg2P7XiwFZf/LmD+1oA7mzL2RKDYfgYOHGEMkr7Rc8OB0TB3StGaPVthEay9L3FYjAVehxBH1/c/r8qb50vN7jvwPKnym030Grl2hxfpUFKmZpMSV6isn7MnaQVtgqHm1zwg5Mm88ZnlZSayzEvjqjaukS1NSyl3StE=

@@ -1,0 +1,37 @@
+version: '3.6'
+
+services:
+
+  nginx:
+    restart: unless-stopped
+    depends_on:
+      - wordpress
+    build:
+      context: ./nginx
+    volumes:
+      - "./var/www/html:/var/www/html"
+
+  wordpress:
+    restart: unless-stopped
+    depends_on:
+      - mysql
+    build:
+      context: ./wordpress
+    environment:
+      WORDPRESS_DB_HOST: "mysql"
+      WORDPRESS_DB_USER: "root"
+      WORDPRESS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+    volumes:
+      - "./var/www/html:/var/www/html"
+
+  mysql:
+    restart: unless-stopped
+    build:
+      context: ./mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+    volumes:
+      - "./var/mysql:/var/lib/mysql"
+      - "./var/backups:/backups"

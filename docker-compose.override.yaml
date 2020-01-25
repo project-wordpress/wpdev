@@ -1,0 +1,36 @@
+version: '3.6'
+
+services:
+
+  nginx:
+    ports:
+      - ${WORDPRESS_PORT}:80
+
+  wp-cli:
+    command: "develop"
+    depends_on:
+      - wordpress
+    build:
+      context: ./wp-cli
+    environment:
+      WORDPRESS_HOST: "wordpress:9000"
+      WORDPRESS_TITLE:
+      WORDPRESS_LOGIN:
+      WORDPRESS_PASSWORD:
+      WORDPRESS_PORT:
+      WORDPRESS_EMAIL:
+      DOMAIN_NAME:
+    volumes:
+      - "./var/www/html:/var/www/html"
+      - "./var/backups:/backups"
+
+  phpmyadmin:
+    depends_on:
+      - mysql
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: "mysql"
+      PMA_USER: "root"
+      PMA_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - ${PHPMYADMIN_PORT}:80

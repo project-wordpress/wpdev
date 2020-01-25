@@ -1,0 +1,39 @@
+version: '3.6'
+
+volumes:
+  www:
+
+services:
+
+  nginx-proxy:
+    restart: unless-stopped
+#    tested on this image
+#    image: quay.io/bukow/nginx-proxy:01-24-2020
+    image: jwilder/nginx-proxy-alpine
+    ports:
+      - 80:80
+    volumes:
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+
+  nginx:
+    environment:
+      VIRTUAL_HOST: ${DOMAIN_NAME}
+      LETSENCRYPT_HOST: ${DOMAIN_NAME}
+
+  wp-cli:
+    command: "deploy"
+    depends_on:
+      - wordpress
+    build:
+      context: ./wp-cli
+    environment:
+      WORDPRESS_HOST: "wordpress:9000"
+      WORDPRESS_TITLE:
+      WORDPRESS_LOGIN:
+      WORDPRESS_PASSWORD:
+      WORDPRESS_PORT:
+      WORDPRESS_EMAIL:
+      DOMAIN_NAME:
+    volumes:
+      - "./var/www/html:/var/www/html"
+      - "./var/backups:/backups"
