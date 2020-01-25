@@ -3,6 +3,7 @@
 
 Local stack for developing [`wordpress`](https://wordpress.org/)
 
+Future goal of this project is to bring painless developing experience alongside production ready containers ready to be deploy to plain `docker` or `kubernetes` via `CI/CD` pipelines.
 ```bash
 CONTAINER ID        NAME                  CPU %               MEM USAGE / LIMIT    MEM %               NET I/O             BLOCK I/O           PIDS
 
@@ -30,15 +31,31 @@ da0e07d3dcb3        nginx_1        0.00%               2.82MiB / 7.79GiB    0.04
 ```bash
 docker-compose up
 ```
-* Wordpress will be automatically installed and after some time your site should be live at 
+* Wordpress will be automatically installed your site should be live at `
+http://localhost:$WORDPRESS_PORT`
 ```bash
-http://localhost:$WORDPRESS_PORT
+wordpress_1   | Complete! WordPress has been successfully copied to /var/www/html
+wordpress_1   | [25-Jan-2020 22:46:56] NOTICE: fpm is running, pid 1
+wordpress_1   | [25-Jan-2020 22:46:56] NOTICE: ready to handle connections
+wp-cli_1      | wait-for-it: wordpress:9000 is available after 35 seconds
+wp-cli_1      | Developing...
+wp-cli_1      | Installing wordpress...
+wp-cli_1      | Success: WordPress installed successfully.
+wp-cli_1      | Visit http://localhost:9344
+wpdev_wp-cli_1 exited with code 0
 ```
 * phpmyadmin will be live at
 ```bash
 http://localhost:$PHPMYADMIN_PORT
 ```
-
+* to backup your database into `./var/backups` run:
+```bash
+make db-export
+```
+* to import your database into `./mysql/docker-entrypoint-initdb.d` run:
+```bash
+make copy-db
+```
 ## Tests
 * while running `make tests` or directly calling `run_tests.sh` live deployment will be tested too, it means that your host should resolve `$DOMAIN_NAME` from `.env` file
 * to run a simle crawling test checking for status code 200 on your local development run
@@ -123,8 +140,12 @@ http://localhost:$PHPMYADMIN_PORT
 * [travis](https://travis-ci.org/) for builds
 
 # todo & needs fixing
+* design db migration schemas and production database separation
+* make http benchmarking
+* lower mysql ram usage (currently 80MiB)
 * urls like `localhost:9333/asdASDa/435/345/345/345` redirect to `homepage` why?
 * modify `wp-cli` to allow custom setup (activating plugins etc.)
 * allow `crawl.py` allowed rules to be specified in a file
 * create solid `nginx` configuration
-
+* test file permissions and sensitive files
+* mysql 8.0.18 gives `mbind: Operation not permitted`
