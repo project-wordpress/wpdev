@@ -3,51 +3,74 @@
 
 Local stack for developing [`wordpress`](https://wordpress.org/)
 
-Future goal of this project is to bring painless developing experience alongside production ready containers ready to be deploy to plain `docker` or `kubernetes` via `CI/CD` pipelines.
+There is a lot of files, but you may be interested only in few of them, don't worry!
+
+### Usage:
+* You can add plugins and themes that you want to be installed automatically in [wpdev.yaml](./var/config/wpdev.yaml) (for now only official plugins and themes can be installed this way using slug)
+* Edit [.env](./.env) file to your needs (you may want to change ports if you are working on few project at a time )
+* Default themes and plugins that are bundled with wordpress are deleted.
+
+To start execute this command:
 ```bash
-CONTAINER ID        NAME                  CPU %               MEM USAGE / LIMIT    MEM %               NET I/O             BLOCK I/O           PIDS
-
-da0e07d3dcb3        nginx_1        0.00%               2.82MiB / 7.79GiB    0.04%               490kB / 1.01MB      0B / 0B             3
-
-4875a813d4a0        wordpress_1    0.00%               12.78MiB / 7.79GiB   0.16%               603kB / 576kB       0B / 32.8kB         3
-
-7f5cefd9d559        phpmyadmin_1   0.00%               9.32MiB / 7.79GiB    0.12%               210B / 0B           0B / 0B             6
-
-16ce9c05cc74        mysql_1        0.25%               83.1MiB / 7.79GiB    1.04%               146kB / 611kB       0B / 58.2MB         41
+docker-compose up
+```
+* `wordpress` will be live at
+```bash
+http://localhost:$WORDPRESS_PORT
+```
+* `phpmyadmin` will be live at
+```bash
+http://localhost:$PHPMYADMIN_PORT
+```
+```bash
+wordpress_1   | Complete! WordPress has been successfully copied to /var/www/html
+wordpress_1   | [28-Jan-2020 13:05:22] NOTICE: fpm is running, pid 1
+wordpress_1   | [28-Jan-2020 13:05:22] NOTICE: ready to handle connections
+wp-cli_1      | wait-for-it: wordpress:9000 is available after 37 seconds
+wp-cli_1      | Developing...
+wp-cli_1      | declare -x WORDPRESS_PORT="9344"
+wp-cli_1      | Installing wordpress...
+mysql_1       | mbind: Operation not permitted
+wp-cli_1      | Success: WordPress installed successfully.
+wp-cli_1      | Installing plugins...
+wp-cli_1      | Installing themes...
+wp-cli_1      | Deleting plugins
+wp-cli_1      | Deleted 'hello' plugin.
+wp-cli_1      | Success: Deleted 1 of 1 plugins.
+wp-cli_1      | Deleted 'akismet' plugin.
+wp-cli_1      | Success: Deleted 1 of 1 plugins.
+wp-cli_1      | Deleting themes
+wp-cli_1      | Deleted 'twentynineteen' theme.
+wp-cli_1      | Success: Deleted 1 of 1 themes.
+wp-cli_1      | Deleted 'twentyseventeen' theme.
+wp-cli_1      | Success: Deleted 1 of 1 themes.
+wp-cli_1      | Deleted 'twentysixteen' theme.
+wp-cli_1      | Success: Deleted 1 of 1 themes.
+wp-cli_1      | Installing `theme`
+wp-cli_1      | Unpacking the package...
+wp-cli_1      | Installing the theme...
+wp-cli_1      | Theme installed successfully.
+wp-cli_1      | Success: Installed 1 of 1 themes.
+wp-cli_1      | Activating all plugins...
+wp-cli_1      | Success: No plugins installed.
+wp-cli_1      | Activating `theme`
+wp-cli_1      | Success: Switched to 'theme' theme.
+wp-cli_1      | Rewriting permalinks
+wp-cli_1      | Success: Rewrite structure set.
+mysql_1       | mbind: Operation not permitted
+wp-cli_1      | Success: Rewrite rules flushed.
+wp-cli_1      | Visit http://localhost:9344/wp-login.php
 ```
 ## Info
-* please get involved if you can
+* theres `run_tests.sh` or `.gitlab-ci.yml` that can be used to run your tests
 * tests are parsing your site and checking if everything responds with status code `200`, to change that behaviour see [this file](./tests/python/crawl.py)
 * static files are handled by `nginx`
 * wp-cli will handle changing `SITE_URL` based on your `.env` settings
-* this stack can be easy deployed live using `make deploy`
 
 ### Requirements:
 * [docker](https://www.docker.com/)
 * [docker-compose](https://docs.docker.com/compose/)
 
-### Usage:
-* Edit [.env](./.env) file to your needs and run:
-```bash
-docker-compose up
-```
-* Wordpress will be automatically installed your site should be live at `
-http://localhost:$WORDPRESS_PORT`
-```bash
-wordpress_1   | Complete! WordPress has been successfully copied to /var/www/html
-wordpress_1   | [25-Jan-2020 22:46:56] NOTICE: fpm is running, pid 1
-wordpress_1   | [25-Jan-2020 22:46:56] NOTICE: ready to handle connections
-wp-cli_1      | wait-for-it: wordpress:9000 is available after 35 seconds
-wp-cli_1      | Developing...
-wp-cli_1      | Installing wordpress...
-wp-cli_1      | Success: WordPress installed successfully.
-wp-cli_1      | Visit http://localhost:9344
-wpdev_wp-cli_1 exited with code 0
-```
-* phpmyadmin will be live at
-```bash
-http://localhost:$PHPMYADMIN_PORT
-```
 * to backup your database into `./var/backups` run:
 ```bash
 make db-export
@@ -57,11 +80,11 @@ make db-export
 make copy-db
 ```
 ## Tests
-* while running `make tests` or directly calling `run_tests.sh` live deployment will be tested too, it means that your host should resolve `$DOMAIN_NAME` from `.env` file
 * to run a simle crawling test checking for status code 200 on your local development run
     ```bash
     make crawl-local
     ```
+
   ```bash
     PARSED
     {
@@ -142,11 +165,8 @@ make copy-db
 # todo & needs fixing
 * design db migration schemas and production database separation
 * make http benchmarking
-* lower mysql ram usage (currently 80MiB)
-* urls like `localhost:9333/asdASDa/435/345/345/345` redirect to `homepage` why?
-* modify `wp-cli` to allow custom setup (activating plugins etc.)
+* lower mysql and wordpress ram usage (currently 20MiB and 80MiB but after installing theme up to 300MiB and 400MiB?????)
 * allow `crawl.py` allowed rules to be specified in a file
 * create solid `nginx` configuration
 * test file permissions and sensitive files
 * mysql 8.0.18 gives `mbind: Operation not permitted`
-* test db import export

@@ -32,6 +32,8 @@ def is_parsable(url: str):
 def get_body(url: str) -> (int, str):
     resp = requests.get(url, allow_redirects=True)
     try:
+        if any(x in url for x in ["js", ".css", ".png", ".jpg", ".jpeg", ".gif", ".ico"]):
+            return resp.status_code, ""
         body = resp.content.decode()
         return resp.status_code, body
     except Exception as exc:

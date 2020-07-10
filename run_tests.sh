@@ -10,8 +10,6 @@ declare -r DEVELOP="docker-compose -f docker-compose.yaml -f docker-compose.over
 declare -r ALIVE="docker-compose -f docker-compose.yaml -f docker-compose.deploy.yaml"
 
 ${DEVELOP} build
-${ALIVE} build
-
 
 function test_development() {
     ${DEVELOP} up --exit-code-from=wp-cli
@@ -30,19 +28,6 @@ function test_alive() {
 }
 
 test_development
-test_alive
+${DEVELOP} down
 test_development
-
-${ALIVE} down -v ||
-${DEVELOP} down -v ||
-
-test_alive
-test_development
-
-docker stats --no-stream
-docker ps
-
-${ALIVE} down -v ||
-${DEVELOP} down -v ||
-
 exit 0

@@ -1,0 +1,70 @@
+image: quay.io/project-wordpress/docker:18.04-compose
+
+services:
+  - docker:18.04-dind
+
+#cache: &cache
+#  key: ${CI_COMMIT_REF_SLUG}
+#  paths:
+#    - ./var/
+
+#variables:
+#    DOCKER_HOST: tcp://localhost:2375
+#    DOCKER_DRIVER: overlay2
+
+test:
+  stage: test
+#  cache:
+#    <<: *cache
+
+  before_script:
+    - source .env
+    - echo "127.0.0.1 ${DOMAIN_NAME}" | tee -a /etc/hosts
+    - chmod +x ./run_tests.sh
+#    - export gid=82
+#    - export uid=82
+#    - export user=www-data
+#    - addgroup --gid "$gid" "$user" \
+#      && adduser \
+#      --disabled-password \
+#      --gecos "" \
+#      --home "$(pwd)" \
+#      --ingroup "$user" \
+#      --no-create-home \
+#      --uid "$uid" \
+#      "$user"
+#    - chown -R 82:82 ./var
+  script:
+    - ./run_tests.sh
+  after_script:
+    - docker ps
+    - docker stats --no-stream
+    - ls -al ./var/www/html/wp-content
+    - ls -al ./var/www/html/
+    - docker-compose logs
+#
+#docker-build-master:
+#  stage: build
+#  image: docker:18.04
+#  before_script:
+#    - docker login -u "$CI_REGISTRY_user" -p "$CI_REGISTRY_PASSWORD" $CI_REGISTRY
+#  variables:
+#    MYSQL_IMAGE: $CI_REGISTRY_IMAGE/mysql:latest
+#    WORDPRESS_IMAGE: $CI_REGISTRY_IMAGE/wordpress:latest
+#    WPCLI_IMAGE: $CI_REGISTRY_IMAGE/wp-cli:latest
+#    NGINX_IMAGE: $CI_REGISTRY_IMAGE/nginx:latest
+#  script:
+#    - docker pull $MYSQL_IMAGE || true
+#    - docker pull $WORDPRESS_IMAGE || true
+#    - docker pull $WPCLI_IMAGE || true
+#    - docker pull $NGINX_IMAGE || true
+#    - docker build --cache-from $MYSQL_IMAGE -t $MYSQL_IMAGE ./mysql/
+#    - docker build --cache-from $WORDPRESS_IMAGE -t $WORDPRESS_IMAGE ./wordpress/
+#    - docker build --cache-from $WPCLI_IMAGE -t $WPCLI_IMAGE ./wp-cli/
+#    - docker build --cache-from $NGINX_IMAGE -t $NGINX_IMAGE ./nginx/
+#    - docker push $MYSQL_IMAGE
+#    - docker push $WORDPRESS_IMAGE
+#    - docker push $WPCLI_IMAGE
+#    - docker push $NGINX_IMAGE
+#  only:
+#    - master

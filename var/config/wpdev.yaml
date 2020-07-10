@@ -1,0 +1,5 @@
+plugins:
+  - wordpress-seo: wordpress-seo
+
+themes:
+  - business-field: business-field

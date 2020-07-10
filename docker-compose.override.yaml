@@ -23,6 +23,7 @@ services:
     volumes:
       - "./var/www/html:/var/www/html"
       - "./var/backups:/backups"
+      - "./var/config/:/apps/config/"
 
   phpmyadmin:
     depends_on:

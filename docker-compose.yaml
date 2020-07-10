@@ -3,7 +3,6 @@ version: '3.6'
 services:
 
   nginx:
-    restart: unless-stopped
     depends_on:
       - wordpress
     build:
@@ -12,7 +11,6 @@ services:
       - "./var/www/html:/var/www/html"
 
   wordpress:
-    restart: unless-stopped
     depends_on:
       - mysql
     build:
@@ -22,16 +20,19 @@ services:
       WORDPRESS_DB_USER: "root"
       WORDPRESS_DB_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       WORDPRESS_DB_NAME: ${MYSQL_DATABASE}
+      WORDPRESS_DEBUG: 1
+      WORDPRESS_CONFIG_EXTRA: |
+        define( 'UPLOADS', 'wp-content/uploads' );
     volumes:
       - "./var/www/html:/var/www/html"
 
   mysql:
-    restart: unless-stopped
     build:
       context: ./mysql
+    ports:
+      - ${MYSQL_PORT}:3306
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
     volumes:
       - "./var/mysql:/var/lib/mysql"
-      - "./var/backups:/backups"

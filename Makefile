@@ -44,6 +44,9 @@ copy-db:
 	BACKUP_FILE=$(shell make db-export | tail -1);\
 	cp ./var/backups/$$BACKUP_FILE ./mysql/docker-entrypoint-initdb.d
 
+.PHONY: wp
+wp:
+	${DEV} run wp-cli $(args)
 #file=connect
 #folder=./tests/python
 #args="localhost ${WORDPRESS_PORT} / 200"
@@ -59,6 +62,10 @@ tests:
 .PHONY: crawl-local
 crawl-local:
 	make folder=./tests/python file=crawl test args="http://localhost:${WORDPRESS_PORT}"
+
+.PHONY: wp-cli-up
+wp-cli-up:	## wp-cli up build
+	${DEV} up --build wp-cli
 
 .PHONY: help
 help:
